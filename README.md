@@ -1,4 +1,0 @@
-CFIT
-====
-
-cFit package
