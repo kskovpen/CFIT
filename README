@@ -1,0 +1,63 @@
+===== ABOUT
+
+  CFIT is a package to perform a template fit with incorporating
+  systematic uncertainties in a correlation matrix. Systematic
+  correlations between templates and bin-by-bin correlations in the
+  fitted variable are taken into account. The method has been proposed
+  in CMS AN-14-069, for more details on the method please see the note.
+
+  Contact: Kirill.Skovpen@cern.ch
+
+===== INSTALL
+
+  > tar -zxvf cfit_1_0.tar.gz
+  > cd cFit
+  > make
+  
+===== INPUT PARAMETERS
+  
+  All input parameters are set in input.txt file, an example:
+  
+     [FILE] input2.root
+     #[FILE] input1.root
+     [TEMPLATE] H0 H1 H2
+     #[TEMPLATE] H0
+     [NOMINAL] nom
+     [SYS] SYS1 sys1m sys1p
+     [SYS] SYS2 sys2m sys2p
+     [DATA] data
+     [COV] WRITE cov.root
+
+  [FILE]      : name of the input file with histograms
+  [TEMPLATE]  : list of template names
+  [NOMINAL]   : name of the subname of nominal histogram (also see below)
+  [SYS]       : 'name of systematic uncertainty' '-sigma variation' '+sigma variation'
+  [DATA]      : name of data histogram
+  [COV]       : 'WRITE' or 'READ' covariance matrix from file 'cov.root'
+  
+  Lines with '#' as a first character are ignored. All words should be specified with a single space character.
+  Naming convention for histograms using the example above:
+  
+     'H0nom': nominal histogram for 'H0' template
+     'H0sys1p': systematic +sigma variation for 'H0'
+     'H0sys1m': systematic -sigma variation for 'H0'
+
+  Please note that there is no additional normalisation of histograms
+  in the tool. Total uncertainties are calculated using templates
+  normalisation as in input files. Systematics with the same
+  name are treated as correlated among the templates.
+
+===== RUN
+
+  CFIT usage could be seen in example test.C. To run the tool do:
+
+  > root test.C
+  
+  This will print out the result chi2/ndof along with the fitted
+  parameters and its uncertainties. Two image files are additionally
+  created: SYS.eps (fractional systematic uncertainties) and
+  RESULTS.eps (fitted templates with data histogram)
+  
+  There are two example input files to illustrate the work of
+  the tool: input1.root (one template fit) and input2.root (3-template fit)
+  
