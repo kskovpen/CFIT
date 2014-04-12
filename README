@@ -10,8 +10,8 @@
 
 ===== INSTALL
 
-  > tar -zxvf cfit_1_0.tar.gz
-  > cd cFit
+  > tar -zxvf cFit_1_0.tar.gz
+  > cd CFIT
   > make
   
 ===== INPUT PARAMETERS
