@@ -1033,9 +1033,9 @@ void CFIT::cfit::doFracSys(TH1D *hnom,TH1D *hsysDown,TH1D *hsysUp,int isys)
 	     bUp_cov = 0.;
 	  }
 	
-	hsysDownf->SetBinContent(ib0,1.+bDown);
+	hsysDownf->SetBinContent(ib0,1.-bDown);
 	hsysDownf->SetBinError(ib0,0.);
-	hsysUpf->SetBinContent(ib0,1.+bUp);
+	hsysUpf->SetBinContent(ib0,1.-bUp);
 	hsysUpf->SetBinError(ib0,0.);
 
 	hsysDownf_cov->SetBinContent(ib0,bDown_cov);
