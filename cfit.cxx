@@ -770,6 +770,12 @@ void CFIT::cfit::applySys(std::vector<double> sf,
 		  
 		  norm[i1][i2] = sqrt(norm_i1_v)*sqrt(norm_i2_v);
 		  
+		  if( i1 == i2 && norm[i1][i2] == 0. )
+		    {
+		       std::cout << "Input histograms have empty bin #" << i1 << " in both data and MC templates: please adjust the binning" << std::endl;
+		       exit(1);
+		    }		  
+		  
 		  if( i1 == i2 ) 
 		    {
 		       norm1D[i1] = sqrt(norm_i1_v);
@@ -889,8 +895,11 @@ void CFIT::cfit::doFit(double *par,double *err,double *chis)
    Double_t arglist[10];
    Int_t ierflg = 0;
    
-   arglist[0] = 3;
-   gMinuit->mnexcm("SET ERR",arglist,1,ierflg);   
+   arglist[0] = 1;
+   gMinuit->mnexcm("SET ERR",arglist,1,ierflg);
+   
+   arglist[0] = 5000;
+   arglist[1] = 0.1;
    
    for(int i=0;i<nT;i++)
      {
@@ -916,7 +925,7 @@ void CFIT::cfit::doFit(double *par,double *err,double *chis)
 	gMinuit->FixParameter(2);
      }   
 */  
-   gMinuit->mnexcm("MIGRAD", arglist ,0,ierflg);
+   gMinuit->mnexcm("MIGRAD", arglist ,2,ierflg);
 
    for(int i=0;i<nT;i++)
      {   
@@ -934,10 +943,10 @@ void CFIT::cfit::doFit(double *par,double *err,double *chis)
    
    applySys(sf,sferr,1);
    
-   gMinuit->mnexcm("MIGRAD", arglist ,0,ierflg);
-   gMinuit->mnexcm("MINOS", arglist ,0,ierflg);
-   gMinuit->mnexcm("MIGRAD", arglist ,0,ierflg);
-   gMinuit->mnexcm("MINOS", arglist ,0,ierflg);
+   gMinuit->mnexcm("MIGRAD", arglist ,2,ierflg);
+   gMinuit->mnexcm("MINOS", arglist ,2,ierflg);
+   gMinuit->mnexcm("MIGRAD", arglist ,2,ierflg);
+   gMinuit->mnexcm("MINOS", arglist ,2,ierflg);
 
    double paramErrP[nT];
    double paramErrM[nT];

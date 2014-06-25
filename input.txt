@@ -3,7 +3,7 @@
 [TEMPLATE] H0 H1 H2
 #[TEMPLATE] H0
 [NOMINAL] nom
-[SYS] SYS1 sys1m sys1p
-[SYS] SYS2 sys2m sys2p
+#[SYS] SYS1 sys1m sys1p
+#[SYS] SYS2 sys2m sys2p
 [DATA] data
 [COV] WRITE cov.root
