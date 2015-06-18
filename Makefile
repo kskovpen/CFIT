@@ -5,7 +5,7 @@ ROOTGLIBS     = $(shell root-config --glibs)
 CXX           = gcc -fPIC
 LD            = gcc
 LDFLAGS       = -g
-SOFLAGS       = -shared
+SOFLAGS       = -shared -O3
 
 CXXFLAGS       = $(ROOTCFLAGS) -fPIC
 INCLUDE_FLAGS  = 
