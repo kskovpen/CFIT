@@ -3,5 +3,5 @@ systematic uncertainties in a correlation matrix. Systematic
 correlations between templates and bin-by-bin correlations in the
 fit variables are taken into account. 
   
-Documentation is [available](doc/doc.pdf)
+Documentation is [available](https://github.com/kskovpen/CFIT/doc/doc.pdf)
 
