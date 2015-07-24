@@ -521,8 +521,12 @@ void CFIT::cfit::processInput(std::string option)
 	     std::cout << "Data histogram is empty" << std::endl;
 	     reset();
 	     exit(1);
-	  }	
+	  }
+
 	_NDATA = h_data->Integral(0,h_data->GetXaxis()->GetNbins()+1);
+
+	// adjust empty bins in data
+	adjust(h_data.get());
      }
    else
      {
@@ -545,7 +549,7 @@ void CFIT::cfit::processInput(std::string option)
 	std::string hdcopyTAG = nameDATATAG+"_TAGcopy";
 	h_data_tag = std::unique_ptr<TH1D>( (static_cast<TH1D*>(hdTAG->Clone(hdcopyTAG.c_str()))) );
 	delete hdTAG;
-
+	
 	if( h_data_tag->Integral() == 0. )
 	  {
 	     std::cout << "Data tag histogram is empty" << std::endl;
@@ -565,7 +569,7 @@ void CFIT::cfit::processInput(std::string option)
 	std::string hdcopyUNTAG = nameDATAUNTAG+"_UNTAGcopy";
 	h_data_untag = std::unique_ptr<TH1D>( (static_cast<TH1D*>(hdUNTAG->Clone(hdcopyUNTAG.c_str()))) );
 	delete hdUNTAG;
-
+	
 	if( h_data_untag->Integral() == 0. )
 	  {
 	     std::cout << "Data untag histogram is empty" << std::endl;
@@ -1075,8 +1079,7 @@ void CFIT::cfit::processInput(std::string option)
 	if( *verb ) std::cout << "Fit is done in the range of bins #" << ibinMin << "-" << ibinMax << std::endl;
 	
 	// adjust empty bins in data
-	
-	adjust(h_data.get());
+//	adjust(h_data.get());
 
 	for(int it=0;it<*nT;it++)
 	  {	
@@ -1101,7 +1104,7 @@ void CFIT::cfit::processInput(std::string option)
 	bool doRebin = ( ibinMax < nb0 || ibinMin > 1 );
 	const int arrs = ibinMax-(ibinMin-1)+1;
 	double xnew[arrs];
-	    
+
 	xn = mergeBins(h_data.get(),ibinMin,ibinMax,xnew);
 	if( doRebin ) h_data = std::unique_ptr<TH1D>( (static_cast<TH1D*>(h_data->Rebin(arrs-1,"",xn))) );
 	
@@ -2720,6 +2723,7 @@ double* CFIT::cfit::mergeBins(TH1D *h,int ibmin,int ibmax,double xnew[])
 	  }	
 	
 	xnew[idx] = h->GetXaxis()->GetBinUpEdge(ibmax);
+//	xnew[idx] = h->GetXaxis()->GetBinUpEdge(h->GetXaxis()->GetNbins());
 	
 	sumErrMin = sqrt(sumErrMin);
 	sumErrMax = sqrt(sumErrMax);
