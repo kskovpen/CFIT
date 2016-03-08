@@ -523,10 +523,10 @@ void CFIT::cfit::processInput(std::string option)
 	     exit(1);
 	  }
 
-	_NDATA = h_data->Integral(0,h_data->GetXaxis()->GetNbins()+1);
-
 	// adjust empty bins in data
 	adjust(h_data.get());
+	
+	_NDATA = h_data->Integral(0,h_data->GetXaxis()->GetNbins()+1);
      }
    else
      {
