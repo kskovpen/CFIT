@@ -18,8 +18,11 @@ void fcnSysM(int &npar, double *gin, double &f, double *par, int iflag);
 
 std::unique_ptr<std::vector<int> > CFIT::cfit::vecM;
 
+std::unique_ptr<std::vector<int> > CFIT::cfit::PARIDXFIT;
+
 std::unique_ptr<int> CFIT::cfit::covMode;
 std::unique_ptr<int> CFIT::cfit::nT;
+std::unique_ptr<int> CFIT::cfit::nTFIT;
 std::unique_ptr<int> CFIT::cfit::nBINS;
 std::unique_ptr<double> CFIT::cfit::CHISQ;
 std::unique_ptr<int> CFIT::cfit::NDOF;
@@ -51,6 +54,7 @@ CFIT::cfit::cfit(std::string name)
    
    covMode.reset(); covMode = std::unique_ptr<int>(new int(0));
    nT.reset(); nT = std::unique_ptr<int>(new int(0));
+   nTFIT.reset(); nTFIT = std::unique_ptr<int>(new int(0));
    nBINS.reset(); nBINS = std::unique_ptr<int>(new int(0));
    CHISQ.reset(); CHISQ = std::unique_ptr<double>(new double(0));
    NDOF.reset(); NDOF = std::unique_ptr<int>(new int(0));
@@ -60,6 +64,8 @@ CFIT::cfit::cfit(std::string name)
    
    vecM.reset(); vecM = std::unique_ptr<std::vector<int> >(new std::vector<int>);
 
+   PARIDXFIT.reset(); PARIDXFIT = std::unique_ptr<std::vector<int> >(new std::vector<int>);
+   
    optMode = OPT_NONE;
    optMorphMode = OPTMORPH_GEOMETRIC;
    optMorphFrac = 1.;
@@ -187,23 +193,118 @@ void CFIT::cfit::SetDataUntag(std::string name)
    nameDATAUNTAG = name;
 }
 
-void CFIT::cfit::AddTemplate(std::string name,std::string nameNominal)
+void CFIT::cfit::AddTemplate(std::string name,std::string nameNominal,int colour)
 {
    titleT.push_back(name);
    nameT.push_back(nameNominal);
    nameT_CURRENT.push_back(nameNominal);
+   colourT.push_back(colour);
 }
 
-void CFIT::cfit::AddTemplateTag(std::string name,std::string nameTag)
+void CFIT::cfit::AddTemplateTag(std::string name,std::string nameTag,int colour)
 {
    titleTAG.push_back(name);
    nameTAG.push_back(nameTag);
+   colourTAG.push_back(colour);
 }
 
-void CFIT::cfit::AddTemplateUntag(std::string name,std::string nameUntag)
+void CFIT::cfit::AddTemplateUntag(std::string name,std::string nameUntag,int colour)
 {
    titleUNTAG.push_back(name);
    nameUNTAG.push_back(nameUntag);
+   colourUNTAG.push_back(colour);
+}
+
+void CFIT::cfit::GlueTemplates(std::vector<std::string> nameV,std::string nameMerged,int colour)
+{
+   titleGLUE.push_back(nameV);
+   labelGLUE.push_back(nameMerged);
+   colourGLUE.push_back(colour);
+}
+
+void CFIT::cfit::GlueTemplatesTag(std::vector<std::string> nameV,std::string nameMerged,int colour)
+{
+   titleGLUETAG.push_back(nameV);
+   labelGLUETAG.push_back(nameMerged);
+   colourGLUETAG.push_back(colour);
+}
+
+void CFIT::cfit::processGlueTemplates(std::string option)
+{
+   int nReq = titleGLUE.size();
+   if( strcmp(option.c_str(),"tag") == 0 ) nReq = titleGLUETAG.size();
+   
+   *nTFIT = *nT+nReq;
+   
+   int nGlueTotal = 0;
+   
+   for(int ir=0;ir<nReq;ir++)
+     {
+	std::vector<int> glueIndex;
+	
+	int nGlue = 0;
+	if( strcmp(option.c_str(),"tag") == 0 ) nGlue = titleGLUETAG[ir].size();
+	else nGlue = titleGLUE[ir].size();
+	nGlueTotal += nGlue;
+	
+	for(int it=0;it<*nT;it++)
+	  {
+	     std::string titName = "";
+	     if( strcmp(option.c_str(),"tag") == 0 ) titName = titleTAG[it];
+	     else titName = titleT[it];
+	     
+	     for(int ig=0;ig<nGlue;ig++)
+	       {
+		  std::string gluName = "";
+		  if( strcmp(option.c_str(),"tag") == 0 ) gluName = titleGLUETAG[ir][ig];
+		  else gluName = titleGLUE[ir][ig];
+		  
+		  if( strcmp(gluName.c_str(),titName.c_str()) == 0 )
+		    {
+		       ISMERGEDFIT[it] = ir+1;
+		       break;
+		    }		  
+	       }
+	  }	
+     }   
+   
+   int OUT[*nT];
+   for(int it=0;it<*nT;it++)
+     {
+	OUT[it] = 0;	
+     }   
+   int k = 0;
+   
+   for(int it=1;it<*nT;it++)
+     {
+	if( ISMERGEDFIT[it] == 0 )
+	  {
+	     k++;
+	     OUT[it] = k;
+	  }	
+	else
+	  {
+	     for(int j=0;j<it;j++)
+	       {
+		  if( ISMERGEDFIT[it] == ISMERGEDFIT[j] ) OUT[it] = OUT[j];
+	       }	     
+	     
+	     if( OUT[it] == 0 )
+	       {
+		  k++;
+		  OUT[it] = k;
+	       }	     
+	  }	
+     }   
+   
+   if( nReq != 0 ) *nTFIT -= nGlueTotal;
+   else *nTFIT = *nT;
+   
+   for(int it=0;it<*nT;it++)
+     {
+	PARIDXFIT->at(it) = OUT[it];
+//	std::cout << PARIDXFIT->at(it) << " " << ISMERGEDFIT[it] << std::endl;
+     }   
 }
 
 void CFIT::cfit::sortTemplateNames()
@@ -235,14 +336,17 @@ void CFIT::cfit::sortTemplateNames()
      {	
 	std::vector<std::string> titleTAG_sorted = titleTAG;
 	std::vector<std::string> nameTAG_sorted = nameTAG;
+	std::vector<int> colourTAG_sorted = colourTAG;
 	nameTAG.clear();
 	titleTAG.clear();
+	colourTAG.clear();
 	
 	for(int it=0;it<*nT;it++)
 	  {
 	     int idx = nameId_tag[it];
 	     nameTAG.push_back(nameTAG_sorted[idx]);
 	     titleTAG.push_back(titleTAG_sorted[idx]);
+	     colourTAG.push_back(colourTAG_sorted[idx]);
 	  }   
      }   
 
@@ -273,14 +377,17 @@ void CFIT::cfit::sortTemplateNames()
      {	   
 	std::vector<std::string> titleUNTAG_sorted = titleUNTAG;
 	std::vector<std::string> nameUNTAG_sorted = nameUNTAG;
+	std::vector<int> colourUNTAG_sorted = colourUNTAG;
 	nameUNTAG.clear();
 	titleUNTAG.clear();
+	colourUNTAG.clear();
 	
 	for(int it=0;it<*nT;it++)
 	  {
 	     int idx = nameId_untag[it];
 	     nameUNTAG.push_back(nameUNTAG_sorted[idx]);
 	     titleUNTAG.push_back(titleUNTAG_sorted[idx]);
+	     colourUNTAG.push_back(colourUNTAG_sorted[idx]);
 	  }   
      }   
 }
@@ -390,12 +497,6 @@ void CFIT::cfit::reset()
    ibinMax = NBINMAX;
    ibinMin = 1;
 
-   for(int i=0;i<NTEMPLATEMAX;i++)
-     {
-	PAR[i] = 1.;
-	ERR[i] = 0.;
-     }   
-      
    if( vecM.get() ) {vecM.reset(); vecM = std::unique_ptr<std::vector<int> >(new std::vector<int>);}
 
    *VALID = 0;
@@ -403,6 +504,16 @@ void CFIT::cfit::reset()
    covMIp.reset(); covMIp = std::unique_ptr<TMatrixD>(new TMatrixD(NBINMAX,NBINMAX));
    covMp.reset(); covMp = std::unique_ptr<TMatrixD>(new TMatrixD(NBINMAX,NBINMAX));
    norm1Dp.reset(); norm1Dp = std::unique_ptr<TVectorD>(new TVectorD(NBINMAX));
+   
+   PARIDXFIT.reset(); PARIDXFIT = std::unique_ptr<std::vector<int> >(new std::vector<int>);
+   
+   for(int i=0;i<NTEMPLATEMAX;i++)
+     {
+	PAR[i] = 1.;
+	ERR[i] = 0.;
+	PARIDXFIT->push_back(i);
+	ISMERGEDFIT[i] = 0;
+     }   
 }
 
 void CFIT::cfit::resetNames()
@@ -420,6 +531,10 @@ void CFIT::cfit::resetNames()
    titleT.clear();
    titleTAG.clear();
    titleUNTAG.clear();
+
+   colourT.clear();
+   colourTAG.clear();
+   colourUNTAG.clear();
    
    nameSYS.clear();
    nameSYSDOWN.clear();
@@ -1165,9 +1280,9 @@ double funcDEFM(double vdata1,
    
    for(int i=0;i<vmc1.size();i++)
      {
-	term1 += par[i]*vmc1[i];
-	term2 += par[i]*vmc2[i];
-     }      
+	term1 += par[CFIT::cfit::PARIDXFIT->at(i)]*vmc1[i];
+	term2 += par[CFIT::cfit::PARIDXFIT->at(i)]*vmc2[i];
+     }
    
    double val = ((vdata1-term1)/norm1)*((vdata2-term2)/norm2)*covEL;
    
@@ -1964,7 +2079,7 @@ void CFIT::cfit::doFit(double *chis,std::string option)
    arglist[0] = 5000;
    arglist[1] = 0.1;
    
-   for(int i=0;i<*nT;i++)
+   for(int i=0;i<*nTFIT;i++)
      {
 	std::string pname = "p"+std::string(Form("%d",i));
 	gMinuit->mnparm(i,pname.c_str(),1.,pow(10.,-4),0.00001,1000,ierflg);
@@ -1978,7 +2093,7 @@ void CFIT::cfit::doFit(double *chis,std::string option)
    for(int i=0;i<*nT;i++)
      {   
 	Double_t parg, perg;
-	gMinuit->GetParameter(i,parg,perg);
+	gMinuit->GetParameter(PARIDXFIT->at(i),parg,perg);
 	sf.push_back(parg);
 	sferr.push_back(perg);
 //	std::cout << parg[i] << "+" << perg[i] << std::endl;
@@ -2000,7 +2115,11 @@ void CFIT::cfit::doFit(double *chis,std::string option)
   
    for(int i=0;i<*nT;i++)
      {	
-	gMinuit->mnerrs(i,paramErrP[i],paramErrM[i],paramErrS[i],paramErrG[i]);
+	gMinuit->mnerrs(PARIDXFIT->at(i),
+			paramErrP[PARIDXFIT->at(i)],
+			paramErrM[PARIDXFIT->at(i)],
+			paramErrS[PARIDXFIT->at(i)],
+			paramErrG[PARIDXFIT->at(i)]);
      }   
    
    arglist[0] = 3;
@@ -2014,7 +2133,7 @@ void CFIT::cfit::doFit(double *chis,std::string option)
 
    for(int i=0;i<*nT;i++)
      {	   
-	gMinuit->GetParameter(i,pval[i],perr[i]);
+	gMinuit->GetParameter(PARIDXFIT->at(i),pval[i],perr[i]);
 	if( *verb ) std::cout << histNOM.at(i)->GetName() << " " << pval[i] << " +- " << perr[i] << std::endl;
      }   
 
@@ -2040,6 +2159,8 @@ void CFIT::cfit::Run(std::string option)
      }
    
    processInput(option);
+   
+   processGlueTemplates(option);
 
    sf.clear();
    sferr.clear();
@@ -2272,8 +2393,14 @@ void CFIT::cfit::applySF(std::string option)
    TLegend *legf = new TLegend(0.60,0.90,0.88,0.60);
    legf->SetFillColor(253);
    legf->SetBorderSize(0);   
-   
+
+   bool isTag = 0;
+   if( strcmp(option.c_str(),"tag") == 0 ) isTag = 1;
+         
    TH1D *h_clone[*nT];
+   int hasLine[*nT];
+   for(int it=0;it<*nT;it++) hasLine[it] = 0;
+   
    for(int i=*nT-1;i>=0;i--)
      {
 	std::string hname = "hist"+nameT_CURRENT[i]+"_clone";
@@ -2282,34 +2409,79 @@ void CFIT::cfit::applySF(std::string option)
 	PAR[i] = sf[i];
 	ERR[i] = sferr[i];
 	h_clone[i]->SetMarkerSize(0);
-	h_clone[i]->SetLineColor(2+i);
-	h_clone[i]->SetFillColor(2+i);
+
+	int colour = 2+i;
+	if( isTag ) colour = colourTAG[i];
+	else colour = colourT[i];
+	
+	if( ISMERGEDFIT[i] && isTag ) colour = colourGLUETAG[ISMERGEDFIT[i]-1];
+	else if( ISMERGEDFIT[i] && !isTag ) colour = colourGLUE[ISMERGEDFIT[i]-1];
+	
+	h_clone[i]->SetLineColor(colour);
+	h_clone[i]->SetFillColor(colour);
+	
+	h_clone[i]->Scale(_NDATA);
 	h_draw_st_fit->Add(h_clone[i]);
      }   
 
+   h_data->Scale(_NDATA);
+   
    h_data->SetMarkerStyle(20);
    h_data->SetMarkerSize(0.8);
-   h_draw_st_fit->Draw("hist e1");
-   h_data->Draw("e1 same");
+//   h_draw_st_fit->Draw("hist e1");
+   h_draw_st_fit->Draw("hist");
+   h_data->Draw("pe1x0 same");
+//   h_data->Draw("pe1 same");
    
    legf->SetHeader(legendName.c_str());
    
-   legf->AddEntry(h_data.get(),"Data","lep");
+   legf->AddEntry(h_data.get(),"Data","ep");
 
+   int mergeCur = 0;
    for(int i=0;i<*nT;i++)
      {
-	legf->AddEntry(h_clone[i],titleT[i].c_str(),"f");
+	if( hasLine[i] )
+	  {
+	     h_clone[i]->SetLineColor(1);
+	     h_clone[i]->SetLineWidth(2);	     
+	  }	
+	else
+	  {
+	     h_clone[i]->SetLineWidth(0);
+	  }	
+	
+	std::string legName = titleT[i];
+	int idx = ISMERGEDFIT[i];
+	if( idx > 0 )
+	  {
+	     if( isTag ) legName = labelGLUETAG[idx-1];
+	     else legName = labelGLUE[idx-1];
+	     if( mergeCur != idx ) legf->AddEntry(h_clone[i],legName.c_str(),"f");
+	     mergeCur = idx;
+	  }	
+	else legf->AddEntry(h_clone[i],legName.c_str(),"f");
      }   
+
+   h_comb->Scale(_NDATA);
+   h_sys_up_combSum->Scale(_NDATA);
+   h_sys_down_combSum->Scale(_NDATA);
    
    TGraphAsymmErrors *gr_mc_merged = makeErrorBand(h_comb,
 						   h_sys_up_combSum,
 						   h_sys_down_combSum);
 
+   gStyle->SetOptStat(0);
+   gStyle->SetOptTitle(0);
+   
    h_comb->SetLineColor(kBlack);
    h_comb->Draw("hist same");
 
-   gr_mc_merged->SetFillStyle(3004);
-   gStyle->SetHatchesLineWidth(2);
+//   gr_mc_merged->SetFillStyle(3004);
+//   gStyle->SetHatchesLineWidth(2);
+//   gStyle->SetHatchesSpacing(0.5);
+   //gr_mc_merged->SetFillStyle(3017);
+   gr_mc_merged->SetFillStyle(3005);
+   gr_mc_merged->SetFillColor(kGray+3);
    gr_mc_merged->Draw("2SAME");
 
    h_draw_st_fit->GetXaxis()->SetTitle(runName.c_str());
@@ -2319,6 +2491,10 @@ void CFIT::cfit::applySF(std::string option)
    h_draw_st_fit->SetMaximum(max*1.1);
    
    legf->Draw();
+
+   float maxMC = h_draw_st_fit->GetMaximum();
+   float maxData = h_data->GetMaximum();
+   h_draw_st_fit->SetMaximum(1.3*std::max(maxMC,maxData));
    
    if( producePlots )
      {	
@@ -2329,29 +2505,84 @@ void CFIT::cfit::applySF(std::string option)
 	
 	// template shape comparison
 	float max = 0.;
+	
+	std::vector<int> isMerged;
+	
+	TH1D* hCopy[*nT];
+	
 	for(int i=0;i<*nT;i++)
 	  {
 	     float integ = h_clone[i]->Integral();
-	     if( integ > 0. ) h_clone[i]->Scale(1./integ);
-	     if( i == 0 ) h_clone[i]->Draw("hist e1");
-	     else h_clone[i]->Draw("hist e1 same");
-	     h_clone[i]->SetFillColor(0);
-	     float hmax = h_clone[i]->GetMaximum();
+	     
+	     hCopy[i] = (TH1D*)h_clone[i]->Clone("hCopy");
+	     
+	     bool foundMerged = 0;
+	     for(int im=0;im<isMerged.size();im++)
+	       {
+		  if( ISMERGEDFIT[i] == isMerged[im] )
+		    {
+		       foundMerged = 1;
+		    }		  
+	       }	     
+	     if( ISMERGEDFIT[i] && !foundMerged ) isMerged.push_back(ISMERGEDFIT[i]);
+	     if( foundMerged ) continue;
+	     
+	     if( ISMERGEDFIT[i] )
+	       {
+		  for(int it=0;it<*nT;it++)
+		    {
+		       if( it == i ) continue;
+		       if( ISMERGEDFIT[it] == ISMERGEDFIT[i] )
+			 {
+			    hCopy[i]->Add(h_clone[it]);
+			    integ += h_clone[it]->Integral();
+			 }		       
+		    }		  
+	       }	     
+	     
+	     if( integ > 0. ) hCopy[i]->Scale(1./integ);
+	     if( i == 0 ) hCopy[i]->Draw("hist e1");
+	     else hCopy[i]->Draw("hist e1 same");
+	     hCopy[i]->SetFillColor(0);
+	     float hmax = hCopy[i]->GetMaximum();
 	     if( hmax > max ) max = hmax;
+	     
+	     int colour = 2+i;
+	     if( isTag ) colour = colourTAG[i];
+	     else colour = colourT[i];
+	     
+	     if( ISMERGEDFIT[i] && isTag ) colour = colourGLUETAG[ISMERGEDFIT[i]-1];
+	     else if( ISMERGEDFIT[i] && !isTag ) colour = colourGLUE[ISMERGEDFIT[i]-1];
+	     
+	     hCopy[i]->SetLineWidth(2);
+	     hCopy[i]->SetLineColor(colour);
 	  }   	
 
 	TLegend *legShape = new TLegend(0.60,0.90,0.88,0.60);
 	legShape->SetFillColor(253);
 	legShape->SetBorderSize(0);
 	legShape->SetHeader(legendName.c_str());
+	
+	int mergeCur = 0;	
 	for(int i=0;i<*nT;i++)
 	  {
 	     if( i == 0 ) 
 	       {
-		  h_clone[i]->SetMaximum(1.1*max);
-		  h_clone[i]->GetXaxis()->SetTitle(runName.c_str());
+		  hCopy[i]->SetMaximum(1.1*max);
+		  hCopy[i]->GetXaxis()->SetTitle(runName.c_str());
+	       }
+	     
+	     std::string legName = titleT[i];
+	     int idx = ISMERGEDFIT[i];
+	     
+	     if( idx > 0 )
+	       {
+		  if( isTag ) legName = labelGLUETAG[idx-1];
+		  else legName = labelGLUE[idx-1];
+		  if( mergeCur != idx ) legShape->AddEntry(hCopy[i],legName.c_str(),"f");
+		  mergeCur = idx;
 	       }	     
-	     legShape->AddEntry(h_clone[i],titleT[i].c_str(),"f");
+	     else legShape->AddEntry(hCopy[i],legName.c_str(),"f");
 	  }   
 	legShape->Draw();
 	
@@ -2359,7 +2590,13 @@ void CFIT::cfit::applySF(std::string option)
 	if( option == "tag" ) fsaveShape = "pics/shape_tag.eps";
 	c1->Print(fsaveShape.c_str());
 	c1->Clear();
+
+	delete legShape;
+	
+	for(int i=0;i<*nT;i++)
+	  delete hCopy[i];
      }   
+   
    delete legf;
    delete h_draw_st_fit;
    delete gr_mc_merged;

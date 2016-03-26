@@ -11,6 +11,7 @@
 #include "TMinuit.h"
 #include "TFile.h"
 #include "TStyle.h"
+#include "TLatex.h"
 #include "TCanvas.h"
 #include "TRandom3.h"
 #include "TLegend.h"
@@ -167,13 +168,19 @@ namespace CFIT
 	void SetDataUntag(std::string name);
 	
 	// add the title and histogram name of the nominal template
-	void AddTemplate(std::string name,std::string nominalName);
+	void AddTemplate(std::string name,std::string nominalName,int colour);
 	
 	// add the title and histogram name of the tag template
-	void AddTemplateTag(std::string name,std::string tagName);
+	void AddTemplateTag(std::string name,std::string tagName,int colour);
 
 	// add the title and histogram name of the un-tag template
-	void AddTemplateUntag(std::string name,std::string untagName);
+	void AddTemplateUntag(std::string name,std::string untagName,int colour);
+	
+	// vary templates simultaneously in the fit
+	void GlueTemplates(std::vector<std::string> nameV,std::string nameMerged = "merged",int colour = 46);
+	
+	// vary templates simultaneously in the fit
+	void GlueTemplatesTag(std::vector<std::string> nameV,std::string nameMerged = "merged",int colour = 46);
 	
 	// set the write/read option for correlation matrix
 	// option="WRITE": write the result matrix to file
@@ -225,6 +232,8 @@ namespace CFIT
 	
 	void processInput(std::string option);
 	
+	void processGlueTemplates(std::string option);
+
 	void sortTemplateNames();
 	
 	int getTemplateId(std::string templateName);
@@ -314,16 +323,26 @@ namespace CFIT
 	std::vector<std::string> titleT;
 	std::vector<std::string> titleTAG;
 	std::vector<std::string> titleUNTAG;
+	std::vector<std::vector<std::string> > titleGLUE;
+	std::vector<std::vector<std::string> > titleGLUETAG;
+	std::vector<int> colourT;
+	std::vector<int> colourTAG;
+	std::vector<int> colourUNTAG;
+	std::vector<std::string> labelGLUE;
+	std::vector<std::string> labelGLUETAG;
+	std::vector<int> colourGLUE;
+	std::vector<int> colourGLUETAG;
 	std::string nameSYSVAR;
 	std::vector<std::string> nameSYS;
 	std::vector<std::string> nameSYSUP;
 	std::vector<std::string> nameSYSDOWN;
+	int ISMERGEDFIT[NTEMPLATEMAX];
 	double cov[NBINMAX][NBINMAX];
 	double norm1D[NBINMAX];
 	
 	double PAR[NTEMPLATEMAX];
 	double ERR[NTEMPLATEMAX];
-
+	
 	TFile *dfile;
 	TH1D *hist[HMAX];
 	
@@ -363,6 +382,11 @@ namespace CFIT
 	static std::unique_ptr<TVectorD> norm1Dp;
 
 	static std::unique_ptr<bool> verb;
+	
+	static std::unique_ptr<std::vector<int> > PARIDXFIT;
+	
+	static std::unique_ptr<int> nTFIT;
+	static std::unique_ptr<int> nTTAGFIT;
 	
       ClassDef(CFIT::cfit,1)
      };
