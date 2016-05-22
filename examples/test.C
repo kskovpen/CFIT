@@ -25,9 +25,9 @@ void test()
    
    cf->SetData("h_data");
    
-   cf->AddTemplate("template1","h_mc1");
-   cf->AddTemplate("template2","h_mc2");
-   cf->AddTemplate("template3","h_mc3");
+   cf->AddTemplate("template1","h_mc1",2);
+   cf->AddTemplate("template2","h_mc2",3);
+   cf->AddTemplate("template3","h_mc3",4);
 
    cf->Run();
    

@@ -29,17 +29,17 @@ void testSF()
    cf->SetDataTag("h_data_tag");
    cf->SetDataUntag("h_data_untag");
    
-   cf->AddTemplate("template1","h_mc1");
-   cf->AddTemplate("template2","h_mc2");
-   cf->AddTemplate("template3","h_mc3");
+   cf->AddTemplate("template1","h_mc1",2);
+   cf->AddTemplate("template2","h_mc2",3);
+   cf->AddTemplate("template3","h_mc3",4);
 
-   cf->AddTemplateTag("template1","h_mc1_tag");
-   cf->AddTemplateTag("template2","h_mc2_tag");
-   cf->AddTemplateTag("template3","h_mc3_tag");
+   cf->AddTemplateTag("template1","h_mc1_tag",2);
+   cf->AddTemplateTag("template2","h_mc2_tag",3);
+   cf->AddTemplateTag("template3","h_mc3_tag",4);
 
-   cf->AddTemplateUntag("template1","h_mc1_untag");
-   cf->AddTemplateUntag("template2","h_mc2_untag");
-   cf->AddTemplateUntag("template3","h_mc3_untag");
+   cf->AddTemplateUntag("template1","h_mc1_untag",2);
+   cf->AddTemplateUntag("template2","h_mc2_untag",3);
+   cf->AddTemplateUntag("template3","h_mc3_untag",4);
    
    cf->Run();   
    getResults(cf,par,err);
@@ -68,11 +68,10 @@ void testSF()
    // perform statistical variation
    cf->SetMatrixOption("READ");
    cf->SetStatVariation(667);
-   cf->ProducePlots(0);
-   
+   cf->ProducePlots(0);   
    cf->Run();
    getResults(cf,par,err);
-
+   cf->SetStatVariation(667);
    cf->Run("tag");
    getResults(cf,par,err);
    
@@ -81,10 +80,9 @@ void testSF()
    // perform systematic variation
    cf->SetMatrixOption("READ");
    cf->SetSysVariation("_sys1_up");
-
    cf->Run();
    getResults(cf,par,err);
-
+   cf->SetSysVariation("_sys1_up");
    cf->Run("tag");
    getResults(cf,par,err);
    
