@@ -2066,7 +2066,7 @@ void CFIT::cfit::doFit(double *chis,std::string option)
 {
    double pval[*nT], perr[*nT];
    
-   TMinuit *gMinuit = new TMinuit(1);
+   TMinuit *gMinuit = new TMinuit(100);
    gMinuit->SetFCN(fcnSysM);
    gMinuit->SetPrintLevel(-1);
    
