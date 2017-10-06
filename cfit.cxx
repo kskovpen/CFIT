@@ -78,6 +78,8 @@ CFIT::cfit::cfit(std::string name)
    producePlots = 0;
 
    *verb = 0;
+   
+   drawPPF = 0;
 }
 
 void CFIT::cfit::SetInputFile(std::string fin)
@@ -2179,6 +2181,12 @@ void CFIT::cfit::Run(std::string option)
    
    applySF(option);
    
+   if( drawPPF )
+     {	
+	drawPrePostFit(option,0);
+	drawPrePostFit(option,1);
+     }   
+   
    // restore flucltuations
    nameSYSVAR = "";
    sysIdx = 0;
@@ -2539,7 +2547,7 @@ void CFIT::cfit::applySF(std::string option)
 			 }		       
 		    }		  
 	       }	     
-	     
+
 	     if( integ > 0. ) hCopy[i]->Scale(1./integ);
 	     if( i == 0 ) hCopy[i]->Draw("hist e1");
 	     else hCopy[i]->Draw("hist e1 same");
@@ -2600,6 +2608,213 @@ void CFIT::cfit::applySF(std::string option)
    delete legf;
    delete h_draw_st_fit;
    delete gr_mc_merged;
+   delete c1;
+}
+
+// draw pre and post fit distributions
+void CFIT::cfit::drawPrePostFit(std::string option,bool postfit)
+{
+   TCanvas *c1 = new TCanvas();
+   c1->Clear();
+   
+   THStack *h_draw_st_fit = new THStack();
+
+   TLegend *legf = new TLegend(0.60,0.90,0.88,0.60);
+   legf->SetFillColor(253);
+   legf->SetBorderSize(0);   
+
+   bool isTag = 0;
+   if( strcmp(option.c_str(),"tag") == 0 ) isTag = 1;
+         
+   TH1D *h_clone[*nT];
+   int hasLine[*nT];
+   for(int it=0;it<*nT;it++) hasLine[it] = 0;
+
+   float totSum = 0.;
+   for(int i=0;i<*nT;i++)
+     {
+	totSum += _NMC[i];
+     }   
+   
+   for(int i=*nT-1;i>=0;i--)
+     {
+	std::string hname = "hist"+nameT_CURRENT[i]+"_clone";
+	h_clone[i] = (TH1D*)(histNOMTRUE[i])->Clone(hname.c_str());
+	h_clone[i]->Scale(totSum);
+	if( postfit ) h_clone[i]->Scale(PAR[i]);
+	h_clone[i]->SetMarkerSize(0);
+
+	int colour = 2+i;
+	if( isTag ) colour = colourTAG[i];
+	else colour = colourT[i];
+	
+	if( ISMERGEDFIT[i] && isTag ) colour = colourGLUETAG[ISMERGEDFIT[i]-1];
+	else if( ISMERGEDFIT[i] && !isTag ) colour = colourGLUE[ISMERGEDFIT[i]-1];
+	
+	h_clone[i]->SetLineColor(colour);
+	h_clone[i]->SetFillColor(colour);
+	
+	h_draw_st_fit->Add(h_clone[i]);
+     }   
+
+   h_data->Scale(_NDATA);
+   
+   h_data->SetMarkerStyle(20);
+   h_data->SetMarkerSize(0.8);
+   h_draw_st_fit->Draw("hist");
+   h_data->Draw("pe1x0 same");
+   
+   legf->SetHeader(legendName.c_str());
+   
+   legf->AddEntry(h_data.get(),"Data","ep");
+
+   int mergeCur = 0;
+   for(int i=0;i<*nT;i++)
+     {
+	if( hasLine[i] )
+	  {
+	     h_clone[i]->SetLineColor(1);
+	     h_clone[i]->SetLineWidth(2);	     
+	  }	
+	else
+	  {
+	     h_clone[i]->SetLineWidth(0);
+	  }	
+	
+	std::string legName = titleT[i];
+	int idx = ISMERGEDFIT[i];
+	if( idx > 0 )
+	  {
+	     if( isTag ) legName = labelGLUETAG[idx-1];
+	     else legName = labelGLUE[idx-1];
+	     if( mergeCur != idx ) legf->AddEntry(h_clone[i],legName.c_str(),"f");
+	     mergeCur = idx;
+	  }	
+	else legf->AddEntry(h_clone[i],legName.c_str(),"f");
+     }   
+
+   gStyle->SetOptStat(0);
+   gStyle->SetOptTitle(0);
+
+   h_draw_st_fit->GetXaxis()->SetTitle(runName.c_str());
+   h_draw_st_fit->GetYaxis()->SetTitle("");
+   
+   double max = h_draw_st_fit->GetMaximum();
+   h_draw_st_fit->SetMaximum(max*1.1);
+   
+   legf->Draw();
+
+   float maxMC = h_draw_st_fit->GetMaximum();
+   float maxData = h_data->GetMaximum();
+   h_draw_st_fit->SetMaximum(1.3*std::max(maxMC,maxData));
+   
+   if( producePlots )
+     {	
+	std::string fsave = "pics/prefitStack.eps";
+	if( postfit ) fsave = "pics/postfitStack.eps";
+	if( option == "tag" ) fsave = "pics/prefitStack_tag.eps";
+	if( option == "tag" && postfit ) fsave = "pics/postfitStack_tag.eps";
+	c1->Print(fsave.c_str());
+	c1->Clear();
+	
+	// template shape comparison
+	float max = 0.;
+	
+	std::vector<int> isMerged;
+	
+	TH1D* hCopy[*nT];
+	
+	for(int i=0;i<*nT;i++)
+	  {
+	     float integ = h_clone[i]->Integral();
+	     
+	     hCopy[i] = (TH1D*)h_clone[i]->Clone("hCopy");
+
+	     bool foundMerged = 0;
+	     for(int im=0;im<isMerged.size();im++)
+	       {
+		  if( ISMERGEDFIT[i] == isMerged[im] )
+		    {
+		       foundMerged = 1;
+		    }		  
+	       }	     
+	     if( ISMERGEDFIT[i] && !foundMerged ) isMerged.push_back(ISMERGEDFIT[i]);
+	     if( foundMerged ) continue;
+	     
+	     if( ISMERGEDFIT[i] )
+	       {
+		  for(int it=0;it<*nT;it++)
+		    {
+		       if( it == i ) continue;
+		       if( ISMERGEDFIT[it] == ISMERGEDFIT[i] )
+			 {
+			    hCopy[i]->Add(h_clone[it]);
+			    integ += h_clone[it]->Integral();
+			 }		       
+		    }		  
+	       }	     
+
+//	     if( integ > 0. ) hCopy[i]->Scale(1./integ);
+	     if( i == 0 ) hCopy[i]->Draw("hist e1");
+	     else hCopy[i]->Draw("hist e1 same");
+	     hCopy[i]->SetFillColor(0);
+	     float hmax = hCopy[i]->GetMaximum();
+	     if( hmax > max ) max = hmax;
+	     
+	     int colour = 2+i;
+	     if( isTag ) colour = colourTAG[i];
+	     else colour = colourT[i];
+	     
+	     if( ISMERGEDFIT[i] && isTag ) colour = colourGLUETAG[ISMERGEDFIT[i]-1];
+	     else if( ISMERGEDFIT[i] && !isTag ) colour = colourGLUE[ISMERGEDFIT[i]-1];
+	     
+	     hCopy[i]->SetLineWidth(2);
+	     hCopy[i]->SetLineColor(colour);
+	  }   	
+
+	TLegend *legShape = new TLegend(0.60,0.90,0.88,0.60);
+	legShape->SetFillColor(253);
+	legShape->SetBorderSize(0);
+	legShape->SetHeader(legendName.c_str());
+	
+	int mergeCur = 0;	
+	for(int i=0;i<*nT;i++)
+	  {
+	     if( i == 0 ) 
+	       {
+		  hCopy[i]->SetMaximum(1.1*max);
+		  hCopy[i]->GetXaxis()->SetTitle(runName.c_str());
+	       }
+	     
+	     std::string legName = titleT[i];
+	     int idx = ISMERGEDFIT[i];
+	     
+	     if( idx > 0 )
+	       {
+		  if( isTag ) legName = labelGLUETAG[idx-1];
+		  else legName = labelGLUE[idx-1];
+		  if( mergeCur != idx ) legShape->AddEntry(hCopy[i],legName.c_str(),"f");
+		  mergeCur = idx;
+	       }	     
+	     else legShape->AddEntry(hCopy[i],legName.c_str(),"f");
+	  }   
+	legShape->Draw();
+	
+	std::string fsaveShape = "pics/prefit.eps";
+	if( postfit ) fsaveShape = "pics/postfit.eps";
+	if( option == "tag" ) fsaveShape = "pics/prefit_tag.eps";
+	if( option == "tag" && postfit ) fsaveShape = "pics/postfit_tag.eps";
+	c1->Print(fsaveShape.c_str());
+	c1->Clear();
+
+	delete legShape;
+	
+	for(int i=0;i<*nT;i++)
+	  delete hCopy[i];
+     }   
+   
+   delete legf;
+   delete h_draw_st_fit;
    delete c1;
 }
 

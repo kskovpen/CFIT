@@ -219,6 +219,9 @@ namespace CFIT
 
 	// get total error for the sum of weighted events for the given template
 	float GetErrTemplate(std::string templateName);
+
+	// get total error for the sum of weighted events for the given template
+	void DrawPrePostFit() {drawPPF = 1;};
 	
       protected:
 
@@ -284,6 +287,8 @@ namespace CFIT
 	
 	void removeMCSys(TH1D *hnom,TH1D *hsysUp,TH1D *hsysDown);
 	
+	void drawPrePostFit(std::string option,bool postfit);
+	
 	// variables
 	
 	double chis[10];
@@ -312,6 +317,7 @@ namespace CFIT
 	int nUNTAG;
 	int nSYS;
 	bool rcov;
+	bool drawPPF;
 	std::string nameDATA_CURRENT;
 	std::string nameDATA;
 	std::string nameDATATAG;
