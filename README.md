@@ -9,9 +9,8 @@ To build a python wrapper:
 
 ./buildPyLib.sh
 
-Make sure you specify the correct path to your python installation.
-The PyCFIT library is _cfit.so. Documention of the methods can be
-found in cfit.py
+Make sure that you specify the correct path to your python installation.
+The PyCFIT library is _cfit.so. Documention of the methods is in cfit.py
 ```
 
 Documentation is [available](./doc/doc.pdf)
