@@ -3,68 +3,68 @@
 
 ClassImp(CFIT::cfit)
 
-double funcDEFM(double vdata1,
-		double vdataErr1,
-		std::vector<double> vmc1,
-		double vdata2,
-		double vdataErr2,
-		std::vector<double> vmc2,
-		double covEL,
-		double norm1,
-		double norm2,
-		double *par);
+//double funcDEFM(double vdata1,
+//		double vdataErr1,
+//		std::vector<double> vmc1,
+//		double vdata2,
+//		double vdataErr2,
+//		std::vector<double> vmc2,
+//		double covEL,
+//		double norm1,
+//		double norm2,
+//		double *par);
 
-void fcnSysM(int &npar, double *gin, double &f, double *par, int iflag);
+//void fcnSysM(int &npar, double *gin, double &f, double *par, int iflag);
 
-std::unique_ptr<std::vector<int> > CFIT::cfit::vecM;
+std::shared_ptr<std::vector<int> > CFIT::cfit::vecM;
 
-std::unique_ptr<std::vector<int> > CFIT::cfit::PARIDXFIT;
+std::shared_ptr<std::vector<int> > CFIT::cfit::PARIDXFIT;
 
-std::unique_ptr<int> CFIT::cfit::covMode;
-std::unique_ptr<int> CFIT::cfit::nT;
-std::unique_ptr<int> CFIT::cfit::nTFIT;
-std::unique_ptr<int> CFIT::cfit::nBINS;
-std::unique_ptr<double> CFIT::cfit::CHISQ;
-std::unique_ptr<int> CFIT::cfit::NDOF;
-std::unique_ptr<bool> CFIT::cfit::VALID;
+std::shared_ptr<int> CFIT::cfit::covMode;
+std::shared_ptr<int> CFIT::cfit::nT;
+std::shared_ptr<int> CFIT::cfit::nTFIT;
+std::shared_ptr<int> CFIT::cfit::nBINS;
+std::shared_ptr<double> CFIT::cfit::CHISQ;
+std::shared_ptr<int> CFIT::cfit::NDOF;
+std::shared_ptr<bool> CFIT::cfit::VALID;
 
-std::vector<std::unique_ptr<TH1D> > CFIT::cfit::histNOM;
-std::vector<std::unique_ptr<TH1D> > CFIT::cfit::histNOMTRUE;
-std::vector<std::unique_ptr<TH1D> > CFIT::cfit::histTAGNOM;
-std::vector<std::unique_ptr<TH1D> > CFIT::cfit::histUNTAGNOM;
-std::vector<std::unique_ptr<TH1D> > CFIT::cfit::histDOWN;
-std::vector<std::unique_ptr<TH1D> > CFIT::cfit::histUP;
-std::unique_ptr<TH1D> CFIT::cfit::h_data;
-std::unique_ptr<TH1D> CFIT::cfit::h_data_tag;
-std::unique_ptr<TH1D> CFIT::cfit::h_data_untag;
+std::vector<std::shared_ptr<TH1D> > CFIT::cfit::histNOM;
+std::vector<std::shared_ptr<TH1D> > CFIT::cfit::histNOMTRUE;
+std::vector<std::shared_ptr<TH1D> > CFIT::cfit::histTAGNOM;
+std::vector<std::shared_ptr<TH1D> > CFIT::cfit::histUNTAGNOM;
+std::vector<std::shared_ptr<TH1D> > CFIT::cfit::histDOWN;
+std::vector<std::shared_ptr<TH1D> > CFIT::cfit::histUP;
+std::shared_ptr<TH1D> CFIT::cfit::h_data;
+std::shared_ptr<TH1D> CFIT::cfit::h_data_tag;
+std::shared_ptr<TH1D> CFIT::cfit::h_data_untag;
 
-std::unique_ptr<TMatrixD> CFIT::cfit::covMIp;
-std::unique_ptr<TMatrixD> CFIT::cfit::covMp;
-std::unique_ptr<TVectorD> CFIT::cfit::norm1Dp;
+std::shared_ptr<TMatrixD> CFIT::cfit::covMIp;
+std::shared_ptr<TMatrixD> CFIT::cfit::covMp;
+std::shared_ptr<TVectorD> CFIT::cfit::norm1Dp;
 
-std::unique_ptr<bool> CFIT::cfit::verb;
+std::shared_ptr<bool> CFIT::cfit::verb;
 
 CFIT::cfit::cfit(std::string name)
 {
    runName = name;
    
-   covMIp.reset(); covMIp = std::unique_ptr<TMatrixD>(new TMatrixD(NBINMAX,NBINMAX));
-   covMp.reset(); covMp = std::unique_ptr<TMatrixD>(new TMatrixD(NBINMAX,NBINMAX));
-   norm1Dp.reset(); norm1Dp = std::unique_ptr<TVectorD>(new TVectorD(NBINMAX));
+   covMIp.reset(); covMIp = std::shared_ptr<TMatrixD>(new TMatrixD(NBINMAX,NBINMAX));
+   covMp.reset(); covMp = std::shared_ptr<TMatrixD>(new TMatrixD(NBINMAX,NBINMAX));
+   norm1Dp.reset(); norm1Dp = std::shared_ptr<TVectorD>(new TVectorD(NBINMAX));
    
-   covMode.reset(); covMode = std::unique_ptr<int>(new int(0));
-   nT.reset(); nT = std::unique_ptr<int>(new int(0));
-   nTFIT.reset(); nTFIT = std::unique_ptr<int>(new int(0));
-   nBINS.reset(); nBINS = std::unique_ptr<int>(new int(0));
-   CHISQ.reset(); CHISQ = std::unique_ptr<double>(new double(0));
-   NDOF.reset(); NDOF = std::unique_ptr<int>(new int(0));
-   VALID.reset(); VALID = std::unique_ptr<bool>(new bool(0));
+   covMode.reset(); covMode = std::shared_ptr<int>(new int(0));
+   nT.reset(); nT = std::shared_ptr<int>(new int(0));
+   nTFIT.reset(); nTFIT = std::shared_ptr<int>(new int(0));
+   nBINS.reset(); nBINS = std::shared_ptr<int>(new int(0));
+   CHISQ.reset(); CHISQ = std::shared_ptr<double>(new double(0));
+   NDOF.reset(); NDOF = std::shared_ptr<int>(new int(0));
+   VALID.reset(); VALID = std::shared_ptr<bool>(new bool(0));
    
-   verb.reset(); verb = std::unique_ptr<bool>(new bool(0));
+   verb.reset(); verb = std::shared_ptr<bool>(new bool(0));
    
-   vecM.reset(); vecM = std::unique_ptr<std::vector<int> >(new std::vector<int>);
+   vecM.reset(); vecM = std::shared_ptr<std::vector<int> >(new std::vector<int>);
 
-   PARIDXFIT.reset(); PARIDXFIT = std::unique_ptr<std::vector<int> >(new std::vector<int>);
+   PARIDXFIT.reset(); PARIDXFIT = std::shared_ptr<std::vector<int> >(new std::vector<int>);
    
    optMode = OPT_NONE;
    optMorphMode = OPTMORPH_GEOMETRIC;
@@ -499,15 +499,15 @@ void CFIT::cfit::reset()
    ibinMax = NBINMAX;
    ibinMin = 1;
 
-   if( vecM.get() ) {vecM.reset(); vecM = std::unique_ptr<std::vector<int> >(new std::vector<int>);}
+   if( vecM.get() ) {vecM.reset(); vecM = std::shared_ptr<std::vector<int> >(new std::vector<int>);}
 
    *VALID = 0;
 
-   covMIp.reset(); covMIp = std::unique_ptr<TMatrixD>(new TMatrixD(NBINMAX,NBINMAX));
-   covMp.reset(); covMp = std::unique_ptr<TMatrixD>(new TMatrixD(NBINMAX,NBINMAX));
-   norm1Dp.reset(); norm1Dp = std::unique_ptr<TVectorD>(new TVectorD(NBINMAX));
+   covMIp.reset(); covMIp = std::shared_ptr<TMatrixD>(new TMatrixD(NBINMAX,NBINMAX));
+   covMp.reset(); covMp = std::shared_ptr<TMatrixD>(new TMatrixD(NBINMAX,NBINMAX));
+   norm1Dp.reset(); norm1Dp = std::shared_ptr<TVectorD>(new TVectorD(NBINMAX));
    
-   PARIDXFIT.reset(); PARIDXFIT = std::unique_ptr<std::vector<int> >(new std::vector<int>);
+   PARIDXFIT.reset(); PARIDXFIT = std::shared_ptr<std::vector<int> >(new std::vector<int>);
    
    for(int i=0;i<NTEMPLATEMAX;i++)
      {
@@ -630,7 +630,7 @@ void CFIT::cfit::processInput(std::string option)
 	     exit(1);
 	  }	
 	std::string hdcopyNOM = nameDATA_CURRENT+"_NOMcopy";
-	h_data = std::unique_ptr<TH1D>( (static_cast<TH1D*>(hdNOM->Clone(hdcopyNOM.c_str()))) );
+	h_data = std::shared_ptr<TH1D>( (static_cast<TH1D*>(hdNOM->Clone(hdcopyNOM.c_str()))) );
 	delete hdNOM;
 
 	if( h_data->Integral() == 0. )
@@ -664,7 +664,7 @@ void CFIT::cfit::processInput(std::string option)
 	  }	
 
 	std::string hdcopyTAG = nameDATATAG+"_TAGcopy";
-	h_data_tag = std::unique_ptr<TH1D>( (static_cast<TH1D*>(hdTAG->Clone(hdcopyTAG.c_str()))) );
+	h_data_tag = std::shared_ptr<TH1D>( (static_cast<TH1D*>(hdTAG->Clone(hdcopyTAG.c_str()))) );
 	delete hdTAG;
 	
 	if( h_data_tag->Integral() == 0. )
@@ -684,7 +684,7 @@ void CFIT::cfit::processInput(std::string option)
 	  }	
 
 	std::string hdcopyUNTAG = nameDATAUNTAG+"_UNTAGcopy";
-	h_data_untag = std::unique_ptr<TH1D>( (static_cast<TH1D*>(hdUNTAG->Clone(hdcopyUNTAG.c_str()))) );
+	h_data_untag = std::shared_ptr<TH1D>( (static_cast<TH1D*>(hdUNTAG->Clone(hdcopyUNTAG.c_str()))) );
 	delete hdUNTAG;
 	
 	if( h_data_untag->Integral() == 0. )
@@ -797,15 +797,15 @@ void CFIT::cfit::processInput(std::string option)
 	if( hnameNOM != nameT_CURRENT[it] )
 	  {	     
 	     TH1D *htNOMTRUE = (TH1D*)dfile->Get(nameT_CURRENT[it].c_str());
-	     histNOMTRUE.push_back(std::unique_ptr<TH1D>( (static_cast<TH1D*>(htNOMTRUE->Clone(hcopyNOMTRUE.c_str()))) ));
+	     histNOMTRUE.push_back(std::shared_ptr<TH1D>( (static_cast<TH1D*>(htNOMTRUE->Clone(hcopyNOMTRUE.c_str()))) ));
 	     delete htNOMTRUE;
 	  }
 	else
 	  {
-	     histNOMTRUE.push_back(std::unique_ptr<TH1D>( (static_cast<TH1D*>(htNOM->Clone(hcopyNOMTRUE.c_str()))) ));
+	     histNOMTRUE.push_back(std::shared_ptr<TH1D>( (static_cast<TH1D*>(htNOM->Clone(hcopyNOMTRUE.c_str()))) ));
 	  }	
 	std::string hcopyNOM = hnameNOM+"_NOMcopy";
-	histNOM.push_back(std::unique_ptr<TH1D>( (static_cast<TH1D*>(htNOM->Clone(hcopyNOM.c_str()))) ));
+	histNOM.push_back(std::shared_ptr<TH1D>( (static_cast<TH1D*>(htNOM->Clone(hcopyNOM.c_str()))) ));
 	delete htNOM;
 	     
 	if( nTAG > 0 )
@@ -830,7 +830,7 @@ void CFIT::cfit::processInput(std::string option)
 		  exit(1);
 	       }	
 	     std::string hcopyTAGNOM = hnameTAGNOM+"_TAGNOMcopy";
-	     histTAGNOM.push_back(std::unique_ptr<TH1D>( (static_cast<TH1D*>(htTAGNOM->Clone(hcopyTAGNOM.c_str()))) ));
+	     histTAGNOM.push_back(std::shared_ptr<TH1D>( (static_cast<TH1D*>(htTAGNOM->Clone(hcopyTAGNOM.c_str()))) ));
 	     delete htTAGNOM;
 
 	     std::string hnameUNTAGNOM = nameUNTAG[it];
@@ -853,7 +853,7 @@ void CFIT::cfit::processInput(std::string option)
 		  exit(1);
 	       }
 	     std::string hcopyUNTAGNOM = hnameUNTAGNOM+"_UNTAGNOMcopy";
-	     histUNTAGNOM.push_back(std::unique_ptr<TH1D>( (static_cast<TH1D*>(htUNTAGNOM->Clone(hcopyUNTAGNOM.c_str()))) ));
+	     histUNTAGNOM.push_back(std::shared_ptr<TH1D>( (static_cast<TH1D*>(htUNTAGNOM->Clone(hcopyUNTAGNOM.c_str()))) ));
 	     delete htUNTAGNOM;
 
 	     int nbNom = histNOM[it]->GetXaxis()->GetNbins();
@@ -908,7 +908,7 @@ void CFIT::cfit::processInput(std::string option)
 		  exit(1);
 	       }	
 	     std::string hcopyDOWN = hnameDOWN+"_DOWNcopy";
-	     histDOWN.push_back(std::unique_ptr<TH1D>( (static_cast<TH1D*>(htDOWN->Clone(hcopyDOWN.c_str()))) ));
+	     histDOWN.push_back(std::shared_ptr<TH1D>( (static_cast<TH1D*>(htDOWN->Clone(hcopyDOWN.c_str()))) ));
 	     delete htDOWN;	     
 
 	     std::string hnameUP = nameT_CURRENT[it]+nameSYSUP[is];
@@ -922,7 +922,7 @@ void CFIT::cfit::processInput(std::string option)
 		  exit(1);
 	       }	
 	     std::string hcopyUP = hnameUP+"_UPcopy";
-	     histUP.push_back(std::unique_ptr<TH1D>( (static_cast<TH1D*>(htUP->Clone(hcopyUP.c_str()))) ));
+	     histUP.push_back(std::shared_ptr<TH1D>( (static_cast<TH1D*>(htUP->Clone(hcopyUP.c_str()))) ));
 	     delete htUP;
 	  }
 	
@@ -937,7 +937,7 @@ void CFIT::cfit::processInput(std::string option)
 		  exit(1);
 	       }	
 	     std::string hcopyDOWN = hnameDOWN+"_DOWNcopy";
-	     histDOWN.push_back(std::unique_ptr<TH1D>( (static_cast<TH1D*>(htDOWN->Clone(hcopyDOWN.c_str()))) ));
+	     histDOWN.push_back(std::shared_ptr<TH1D>( (static_cast<TH1D*>(htDOWN->Clone(hcopyDOWN.c_str()))) ));
 	     delete htDOWN;	     
 
 	     std::string hnameUP = nameT_CURRENT[it];
@@ -949,7 +949,7 @@ void CFIT::cfit::processInput(std::string option)
 		  exit(1);
 	       }	
 	     std::string hcopyUP = hnameUP+"_UPcopy";
-	     histUP.push_back(std::unique_ptr<TH1D>( (static_cast<TH1D*>(htUP->Clone(hcopyUP.c_str()))) ));
+	     histUP.push_back(std::shared_ptr<TH1D>( (static_cast<TH1D*>(htUP->Clone(hcopyUP.c_str()))) ));
 	     delete htUP;
 	  }
      }
@@ -1223,29 +1223,29 @@ void CFIT::cfit::processInput(std::string option)
 	double xnew[arrs];
 
 	xn = mergeBins(h_data.get(),ibinMin,ibinMax,xnew);
-	if( doRebin ) h_data = std::unique_ptr<TH1D>( (static_cast<TH1D*>(h_data->Rebin(arrs-1,"",xn))) );
+	if( doRebin ) h_data = std::shared_ptr<TH1D>( (static_cast<TH1D*>(h_data->Rebin(arrs-1,"",xn))) );
 	
 	for(int it=0;it<*nT;it++)
 	  {		
 	     xn = mergeBins(histNOM[it].get(),ibinMin,ibinMax,xnew);
-	     if( doRebin ) histNOM[it] = std::unique_ptr<TH1D>( (static_cast<TH1D*>(histNOM[it]->Rebin(arrs-1,"",xn))) );
+	     if( doRebin ) histNOM[it] = std::shared_ptr<TH1D>( (static_cast<TH1D*>(histNOM[it]->Rebin(arrs-1,"",xn))) );
 
 	     for(int is=0;is<nSYS;is++)
 	       {
 		  xn = mergeBins(histDOWN[is+it*nSYS].get(),ibinMin,ibinMax,xnew);
-		  if( doRebin ) histDOWN[is+it*nSYS] = std::unique_ptr<TH1D>( (static_cast<TH1D*>(histDOWN[is+it*nSYS]->Rebin(arrs-1,"",xn))) );
+		  if( doRebin ) histDOWN[is+it*nSYS] = std::shared_ptr<TH1D>( (static_cast<TH1D*>(histDOWN[is+it*nSYS]->Rebin(arrs-1,"",xn))) );
 
 		  xn = mergeBins(histUP[is+it*nSYS].get(),ibinMin,ibinMax,xnew);
-		  if( doRebin ) histUP[is+it*nSYS] = std::unique_ptr<TH1D>( (static_cast<TH1D*>(histUP[is+it*nSYS]->Rebin(arrs-1,"",xn))) );
+		  if( doRebin ) histUP[is+it*nSYS] = std::shared_ptr<TH1D>( (static_cast<TH1D*>(histUP[is+it*nSYS]->Rebin(arrs-1,"",xn))) );
 	       }	     
 	     
 	     if( nSYS == 0 )
 	       {
 		  xn = mergeBins(histDOWN[it].get(),ibinMin,ibinMax,xnew);
-		  if( doRebin ) histDOWN[it] = std::unique_ptr<TH1D>( (static_cast<TH1D*>(histDOWN[it]->Rebin(arrs-1,"",xn))) );
+		  if( doRebin ) histDOWN[it] = std::shared_ptr<TH1D>( (static_cast<TH1D*>(histDOWN[it]->Rebin(arrs-1,"",xn))) );
 
 		  xn = mergeBins(histUP[it].get(),ibinMin,ibinMax,xnew);
-		  if( doRebin ) histUP[it] = std::unique_ptr<TH1D>( (static_cast<TH1D*>(histUP[it]->Rebin(arrs-1,"",xn))) );
+		  if( doRebin ) histUP[it] = std::shared_ptr<TH1D>( (static_cast<TH1D*>(histUP[it]->Rebin(arrs-1,"",xn))) );
 	       }
 	  }
 
@@ -1994,11 +1994,11 @@ void CFIT::cfit::applySys(std::vector<double> sfl,
    else
      {
 	std::string matrixMIName = "covMI";
-	covMIp = std::unique_ptr<TMatrixD>(static_cast<TMatrixD*>(fcov->Get(matrixMIName.c_str())));
+	covMIp = std::shared_ptr<TMatrixD>(static_cast<TMatrixD*>(fcov->Get(matrixMIName.c_str())));
 	std::string matrixMName = "covM";
-	covMp = std::unique_ptr<TMatrixD>(static_cast<TMatrixD*>(fcov->Get(matrixMName.c_str())));
+	covMp = std::shared_ptr<TMatrixD>(static_cast<TMatrixD*>(fcov->Get(matrixMName.c_str())));
 	std::string normName = "norm";
-	norm1Dp = std::unique_ptr<TVectorD>(static_cast<TVectorD*>(fcov->Get(normName.c_str())));
+	norm1Dp = std::shared_ptr<TVectorD>(static_cast<TVectorD*>(fcov->Get(normName.c_str())));
      }
 
    if( producePlots )
