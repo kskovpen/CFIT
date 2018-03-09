@@ -45,20 +45,20 @@ const int HMAX = 10000; // the total max number of histograms
 const bool doRescaleSys = 1;
 const bool doNormalise = 1;
 
-extern double funcDEFM(double vdata1,
-		       double vdataErr1,
-		       std::vector<double> vmc1,
-		       double vdata2,
-		       double vdataErr2,
-		       std::vector<double> vmc2,
-		       double covEL,
-		       double norm1,
-		       double norm2,
-		       double meanBias1,
-		       double meanBias2,
-		       double *par);
+//extern double funcDEFM(double vdata1,
+//		       double vdataErr1,
+//		       std::vector<double> vmc1,
+//		       double vdata2,
+//		       double vdataErr2,
+//		       std::vector<double> vmc2,
+//		       double covEL,
+//		       double norm1,
+//		       double norm2,
+//		       double meanBias1,
+//		       double meanBias2,
+//		       double *par);
 
-extern void fcnSysM(int &npar, double *gin, double &f, double *par, int iflag);
+//extern void fcnSysM(int &npar, double *gin, double &f, double *par, int iflag);
 
 typedef enum {
    OPT_NONE,
@@ -363,38 +363,38 @@ namespace CFIT
 
       public:
 	
-	static std::unique_ptr<int> covMode; 
+	static std::shared_ptr<int> covMode; 
 	
-	static std::unique_ptr<std::vector<int> > vecM;
-	static std::unique_ptr<int> nT;
-	static std::unique_ptr<int> nBINS;
-	static std::unique_ptr<double> CHISQ;
-	static std::unique_ptr<int> NDOF;
-	static std::unique_ptr<bool> VALID;
+	static std::shared_ptr<std::vector<int> > vecM;
+	static std::shared_ptr<int> nT;
+	static std::shared_ptr<int> nBINS;
+	static std::shared_ptr<double> CHISQ;
+	static std::shared_ptr<int> NDOF;
+	static std::shared_ptr<bool> VALID;
 
-	static std::vector<std::unique_ptr<TH1D> > histNOM;
-	static std::vector<std::unique_ptr<TH1D> > histNOMTRUE;
-	static std::vector<std::unique_ptr<TH1D> > histTAGNOM;
-	static std::vector<std::unique_ptr<TH1D> > histUNTAGNOM;
-	static std::vector<std::unique_ptr<TH1D> > histDOWN;
-	static std::vector<std::unique_ptr<TH1D> > histUP;
+	static std::vector<std::shared_ptr<TH1D> > histNOM;
+	static std::vector<std::shared_ptr<TH1D> > histNOMTRUE;
+	static std::vector<std::shared_ptr<TH1D> > histTAGNOM;
+	static std::vector<std::shared_ptr<TH1D> > histUNTAGNOM;
+	static std::vector<std::shared_ptr<TH1D> > histDOWN;
+	static std::vector<std::shared_ptr<TH1D> > histUP;
 	
-	static std::unique_ptr<TH1D> h_data;
-	static std::unique_ptr<TH1D> h_data_tag;
-	static std::unique_ptr<TH1D> h_data_untag;
+	static std::shared_ptr<TH1D> h_data;
+	static std::shared_ptr<TH1D> h_data_tag;
+	static std::shared_ptr<TH1D> h_data_untag;
 
-	static std::unique_ptr<TMatrixD> covMIp;
-	static std::unique_ptr<TMatrixD> covMp;
-	static std::unique_ptr<TVectorD> norm1Dp;
+	static std::shared_ptr<TMatrixD> covMIp;
+	static std::shared_ptr<TMatrixD> covMp;
+	static std::shared_ptr<TVectorD> norm1Dp;
 
-	static std::unique_ptr<bool> verb;
+	static std::shared_ptr<bool> verb;
 	
-	static std::unique_ptr<std::vector<int> > PARIDXFIT;
+	static std::shared_ptr<std::vector<int> > PARIDXFIT;
 	
-	static std::unique_ptr<int> nTFIT;
-	static std::unique_ptr<int> nTTAGFIT;
+	static std::shared_ptr<int> nTFIT;
+//	static std::shared_ptr<int> nTTAGFIT;
 	
-      ClassDef(CFIT::cfit,1)
+//      ClassDef(CFIT::cfit,1)
      };
 }
 
