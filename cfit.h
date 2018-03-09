@@ -109,6 +109,10 @@ namespace CFIT
 	// 1: verbose on
 	void SetVerbose(int v);
 
+	// set name of the output directory with plots
+	// name="": directory name
+	void SetPlotDirName(std::string name = "");
+	
 	// set optimization option for systematics correlation treatment
 	// OPT_NONE: no optimization (DEFAULT)
 	// OPT_MORPH: perform the morphing of systematic correlations according to OPTMORPHMODE
@@ -388,6 +392,8 @@ namespace CFIT
 	static std::shared_ptr<TVectorD> norm1Dp;
 
 	static std::shared_ptr<bool> verb;
+	
+	static std::shared_ptr<std::string> plotdir;
 	
 	static std::shared_ptr<std::vector<int> > PARIDXFIT;
 	

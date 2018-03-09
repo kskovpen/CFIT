@@ -44,6 +44,8 @@ std::shared_ptr<TVectorD> CFIT::cfit::norm1Dp;
 
 std::shared_ptr<bool> CFIT::cfit::verb;
 
+std::shared_ptr<std::string> CFIT::cfit::plotdir;
+
 CFIT::cfit::cfit(std::string name)
 {
    runName = name;
@@ -62,6 +64,8 @@ CFIT::cfit::cfit(std::string name)
    
    verb.reset(); verb = std::shared_ptr<bool>(new bool(0));
    
+   plotdir.reset(); plotdir = std::shared_ptr<std::string>(new std::string(""));
+   
    vecM.reset(); vecM = std::shared_ptr<std::vector<int> >(new std::vector<int>);
 
    PARIDXFIT.reset(); PARIDXFIT = std::shared_ptr<std::vector<int> >(new std::vector<int>);
@@ -78,6 +82,8 @@ CFIT::cfit::cfit(std::string name)
    producePlots = 0;
 
    *verb = 0;
+   
+   *plotdir = "pics";
    
    drawPPF = 0;
 }
@@ -549,7 +555,10 @@ void CFIT::cfit::processInput(std::string option)
    if( *verb ) std::cout << "Reset done" << std::endl;
 
    if( option != "tag" && producePlots )
-     system("if [[ ! -d pics ]]; then mkdir pics; else rm -r pics; mkdir pics; fi");
+     {
+	std::string com = "if [[ ! -d "+(*plotdir)+" ]]; then mkdir "+(*plotdir)+"; else rm -r "+(*plotdir)+"; mkdir "+(*plotdir)+"; fi";
+	system(com.c_str());
+     }   
    
    gErrorIgnoreLevel = 2000;
 
@@ -2031,12 +2040,12 @@ void CFIT::cfit::applySys(std::vector<double> sfl,
 	  }	
 	if( option == "" ) 
 	  {
-	     std::string mname = "pics/"+covName+".eps";
+	     std::string mname = (*plotdir)+"/"+covName+".eps";
 	     c1->Print(mname.c_str());
 	  }	
 	else 
 	  {
-	     std::string mname = "pics/"+covName+"_tag.eps";
+	     std::string mname = (*plotdir)+"/"+covName+"_tag.eps";
 	     c1->Print(mname.c_str());
 	  }	
 	c1->Clear();
@@ -2316,17 +2325,17 @@ void CFIT::cfit::doFracSys(TH1D *hnom,TH1D *hsysDown,TH1D *hsysUp,int isys,std::
 	
 	if( producePlots )
 	  {
-	     std::string picname = "pics/sys"+postfix+".eps(";
-	     if( option == "tag" ) picname = "pics/sys"+postfix+"_tag.eps(";
+	     std::string picname = (*plotdir)+"/sys"+postfix+".eps(";
+	     if( option == "tag" ) picname = (*plotdir)+"/sys"+postfix+"_tag.eps(";
 	     if( option != "tag" )
 	       {	
-		  if( isys > 0 && isys != nSYS-1 ) picname = "pics/sys"+postfix+".eps";
-		  else if( isys == nSYS-1 ) picname = "pics/sys"+postfix+".eps)";
+		  if( isys > 0 && isys != nSYS-1 ) picname = (*plotdir)+"/sys"+postfix+".eps";
+		  else if( isys == nSYS-1 ) picname = (*plotdir)+"/sys"+postfix+".eps)";
 	       }
 	     else
 	       {
-		  if( isys > 0 && isys != nSYS-1 ) picname = "pics/sys"+postfix+"_tag.eps";
-		  else if( isys == nSYS-1 ) picname = "pics/sys"+postfix+"_tag.eps)";
+		  if( isys > 0 && isys != nSYS-1 ) picname = (*plotdir)+"/sys"+postfix+"_tag.eps";
+		  else if( isys == nSYS-1 ) picname = (*plotdir)+"/sys"+postfix+"_tag.eps)";
 	       }
 	     c1->Print(picname.c_str());
 	  }   
@@ -2506,8 +2515,8 @@ void CFIT::cfit::applySF(std::string option)
    
    if( producePlots )
      {	
-	std::string fsave = "pics/result.eps";
-	if( option == "tag" ) fsave = "pics/result_tag.eps";
+	std::string fsave = (*plotdir)+"/result.eps";
+	if( option == "tag" ) fsave = (*plotdir)+"/result_tag.eps";
 	c1->Print(fsave.c_str());
 	c1->Clear();
 	
@@ -2594,8 +2603,8 @@ void CFIT::cfit::applySF(std::string option)
 	  }   
 	legShape->Draw();
 	
-	std::string fsaveShape = "pics/shape.eps";
-	if( option == "tag" ) fsaveShape = "pics/shape_tag.eps";
+	std::string fsaveShape = (*plotdir)+"/shape.eps";
+	if( option == "tag" ) fsaveShape = (*plotdir)+"/shape_tag.eps";
 	c1->Print(fsaveShape.c_str());
 	c1->Clear();
 
@@ -2710,10 +2719,10 @@ void CFIT::cfit::drawPrePostFit(std::string option,bool postfit)
    
    if( producePlots )
      {	
-	std::string fsave = "pics/prefitStack.eps";
-	if( postfit ) fsave = "pics/postfitStack.eps";
-	if( option == "tag" ) fsave = "pics/prefitStack_tag.eps";
-	if( option == "tag" && postfit ) fsave = "pics/postfitStack_tag.eps";
+	std::string fsave = (*plotdir)+"/prefitStack.eps";
+	if( postfit ) fsave = (*plotdir)+"/postfitStack.eps";
+	if( option == "tag" ) fsave = (*plotdir)+"/prefitStack_tag.eps";
+	if( option == "tag" && postfit ) fsave = (*plotdir)+"/postfitStack_tag.eps";
 	c1->Print(fsave.c_str());
 	c1->Clear();
 	
@@ -2800,10 +2809,10 @@ void CFIT::cfit::drawPrePostFit(std::string option,bool postfit)
 	  }   
 	legShape->Draw();
 	
-	std::string fsaveShape = "pics/prefit.eps";
-	if( postfit ) fsaveShape = "pics/postfit.eps";
-	if( option == "tag" ) fsaveShape = "pics/prefit_tag.eps";
-	if( option == "tag" && postfit ) fsaveShape = "pics/postfit_tag.eps";
+	std::string fsaveShape = (*plotdir)+"/prefit.eps";
+	if( postfit ) fsaveShape = (*plotdir)+"/postfit.eps";
+	if( option == "tag" ) fsaveShape = (*plotdir)+"/prefit_tag.eps";
+	if( option == "tag" && postfit ) fsaveShape = (*plotdir)+"/postfit_tag.eps";
 	c1->Print(fsaveShape.c_str());
 	c1->Clear();
 
@@ -2865,6 +2874,8 @@ void CFIT::cfit::removeMCSys(TH1D *hnom,TH1D *hsysUp,TH1D *hsysDown)
 }
 
 void CFIT::cfit::SetVerbose(int v) { *verb = v; }
+
+void CFIT::cfit::SetPlotDirName(std::string dirname) { *plotdir = dirname; }
 
 double CFIT::cfit::GetChisq() { return *CHISQ; }
 
