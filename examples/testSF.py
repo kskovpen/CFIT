@@ -66,6 +66,10 @@ def testSF():
    print "effDATA = ", effDATA 
    print "sf = ", effDATA/effMC
 
+   
+   print par
+   print err
+   par, err = [], []
    # perform statistical variation
    cf.SetMatrixOption("READ");
    cf.SetStatVariation(667);
@@ -80,6 +84,9 @@ def testSF():
       par.append(cf.GetPar(i))
       err.append(cf.GetParErr(i))
    
+   print par
+   print err
+   par, err = [], []
    # do the calculation of SF here again ....
    # perform systematic variation
    cf.SetMatrixOption("READ");
@@ -93,5 +100,9 @@ def testSF():
    for i in range(cf.GetNPar()):
       par.append(cf.GetPar(i))
       err.append(cf.GetParErr(i))
+
+   
+   print par
+   print err
 
 testSF()
